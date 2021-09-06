@@ -1,0 +1,215 @@
+# -- Model Description --
+#
+algorithm: DQN
+env: ac-pulse
+dataset_version: v11
+trainer_version: RAY
+
+train:
+    dataset_name: 500k_dataset
+    training_iteration: 12000000
+    checkpoint_frequency: 100
+    time_total: 36000
+    checkpoint_at_end: True
+    analysis_metric: training_iteration
+    analysis_mode: max
+    load_experiment_checkpoint: False
+    train_id: Null
+
+evaluation:
+    datasets_name: ["10k_uniform_dataset_users"]
+    num_workers: 7
+    evaluation_episodes: 0
+    rewards_shift: []
+    is_gamma: 0.99
+    wis_gamma: 0.99
+    use_direct_estimator: True
+    use_custom_estimator: True
+
+config:
+    framework: tf
+    env_config:
+        obs_shape: 63 # 77 without users_scores / 80 with users_scores
+
+    # === Model ===
+    # Number of atoms for representing the distribution of return.
+    # When this is greater than 1 distributional Q-learning is used.
+    # the discrete supports are bounded by v_min and v_max
+    num_atoms: 1
+    v_min: -100.0
+    v_max: 100.0
+    # Whether to use noisy network
+    noisy: False
+    # control the initial value of noisy nets
+    sigma0: 0.5
+    # Whether to use dueling dqn
+    dueling: False
+    # Dense-layer setup for each the advantage branch and the value branch
+    # in a dueling architecture.
+    hiddens: [256, 256]
+    # Whether to use double dqn
+    double_q: False
+    # N-step Q learning
+    n_step: 1
+
+    # === Exploration Settings ===
+    exploration_config:
+        type: SoftQ
+        temperature: 1.0
+
+    explore: True
+
+    # Minimum env steps to optimize for per train call. This value does
+    # not affect learning only the length of iterations.
+    timesteps_per_iteration: 1000
+    # Update the target network every `target_network_update_freq` steps.
+    # BS 32 | target_network_update_freq 600
+    # BS 64 | target_network_update_freq 1200
+    # BS 128 | target_network_update_freq 2500
+    # BS 256 | target_network_update_freq 5000
+    # BS 512 | target_network_update_freq 10000
+    # BS 1024 | target_network_update_freq 20000
+    # BS 2048 | target_network_update_freq 40000
+    # BS 4096 | target_network_update_freq 80000
+    target_network_update_freq: 20000
+
+    # === Replay buffer ===
+    # Size of the replay buffer. Note that if async_updates is set then
+    # each worker will have a replay buffer of this size.
+    # Size of the replay buffer in batches (not timesteps!!!!!).
+    buffer_size: 6000000
+
+    # If True prioritized replay buffer will be used.
+    prioritized_replay: True
+    # Alpha parameter for prioritized replay buffer.
+    # how much prioritization is used
+    # (0 - no prioritization, 1 - full prioritization).
+    prioritized_replay_alpha: 0.8
+    # Beta parameter for sampling from prioritized replay buffer.
+    # To what degree to use importance weights
+    # (0 - no corrections, 1 - full correction).
+    prioritized_replay_beta: 0.4
+    # Final value of beta
+    final_prioritized_replay_beta: 0.4
+    # Time steps over which the beta parameter is annealed.
+    prioritized_replay_beta_annealing_timesteps: 20000
+    # Epsilon to add to the TD errors when updating priorities.
+    prioritized_replay_eps: 0.000001
+    # Whether to LZ4 compress observations
+    compress_observations: False
+    # Callback to run before learning on a multi-agent batch of experiences.
+    before_learn_on_batch: Null
+    # If set this will fix the ratio of replayed from a buffer and learned on
+    # timesteps to sampled from an environment and stored in the replay buffer
+    # timesteps. Otherwise the replay will proceed at the native ratio
+    # determined by train_batch_size / rollout_fragment_length
+
+    # === Optimization ===
+    # Learning rate for adam optimizer
+    lr: 0.0005
+    # Learning rate schedule
+    lr_schedule: Null
+    # Adam epsilon hyper parameter
+    adam_epsilon: 0.00000001
+    # If not None clip gradients during optimization at this value
+    grad_clip: 1.0
+    # How many steps of the model to sample before learning starts.
+    learning_starts: 3000000
+    # Update the replay buffer with this many samples at once. Note that
+    # this setting applies per-worker if num_workers > 1.
+    rollout_fragment_length: 1024 # 32 # 64 # 256 # 512 # 1024 # 2048 # 4096
+    # Size of a batch sampled from replay buffer for training. Note that
+    # if async_updates is set then each worker returns gradients for a
+    # batch of this size.
+    train_batch_size: 1024 # 32 # 64 # 256 # 512 # 1024 # 2048 # 40696
+
+    training_intensity: 7
+
+    # ===== Common Config =====
+
+    # === Settings for Rollout Worker processes ===
+    # Number of rollout worker actors to create for parallel sampling.
+    num_workers: 7
+    # Number of environments to evaluate vectorwise per worker. This enables
+    # model inference batching which can improve performance for inference
+    # bottlenecked workloads.
+    num_envs_per_worker: 1
+    # Divide episodes into fragments of this many steps each during rollouts.
+    # Sample batches of this size are collected from rollout workers and
+    # combined into a larger batch of `train_batch_size` for learning.
+    #
+    # For example given rollout_fragment_length=100 and train_batch_size=1000:
+    #   1. RLlib collects 10 fragments of 100 steps each from rollout workers.
+    #   2. These fragments are concatenated and we perform an epoch of SGD.
+    #
+    # When using multiple envs per worker the fragment size is multiplied by
+    # `num_envs_per_worker`.
+    # rollout_fragment_length: 200
+    # Whether to rollout complete_episodes or truncate_episodes to
+    # `rollout_fragment_length` length unrolls.
+    # batch_mode: truncate_episodes
+    # num_gpus_per_worker: 0.066
+
+    # === Settings for the Trainer process ===
+    # num_gpus: 0.066
+    # Arguments to pass to the policy model.
+
+    model:
+        fcnet_hiddens: [256, 128, 64]
+        fcnet_activation: swish
+        conv_filters: Null
+        conv_activation: relu
+        free_log_std: False
+        no_final_linear: False
+        vf_share_layers: False
+        use_lstm: False
+        max_seq_len: 20
+        lstm_cell_size: 256
+        lstm_use_prev_action_reward: False
+        _time_major: False
+        framestack: True
+        dim: 84
+        grayscale: False
+        zero_mean: True
+        custom_model: Null
+        custom_model_config: {}
+        custom_action_dist: Null
+        custom_preprocessor: Null
+
+    # === Debug Settings ===
+    # Set the ray.rllib.* log level for the agent process and its workers.
+    # Should be one of DEBUG INFO WARN or ERROR.
+    log_level: DEBUG
+
+    # === Evaluation Settings ===
+    # Evaluate with every `evaluation_interval` training iterations.
+    evaluation_interval: Null
+    # Number of episodes to run per evaluation period.
+    evaluation_num_episodes: 20
+    # Internal flag that is set to True for evaluation workers.
+    in_evaluation: False
+    evaluation_config:
+        input: []
+    # Number of parallel workers to use for evaluation.
+    evaluation_num_workers: 0
+    # Customize the evaluation method.
+    custom_eval_function: Null
+
+    # === Advanced Rollout Settings ===
+    # Use a background thread for sampling (slightly off-policy)
+    sample_async: False
+
+    # === Offline Datasets ===
+    # Specify how to generate experiences
+    input: []
+    # Specify how to evaluate the current policy.
+    input_evaluation: ["is", "wis"]
+    # Whether to run postprocess_trajectory() on the trajectory fragments from
+    # offline inputs. Note that postprocessing will be done using the *current*
+    # policy not the *behavior* policy which is typically undesirable for
+    # on-policy algorithms.
+    postprocess_inputs: True
+    # If positive input batches will be shuffled via a sliding window buffer
+    # of this number of batches. Use this if the input data is not in random
+    # enough order. Input is delayed until the shuffle buffer is filled.
+    shuffle_buffer_size: 0

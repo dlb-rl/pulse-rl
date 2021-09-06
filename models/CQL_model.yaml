@@ -1,0 +1,31 @@
+# -- Model Description --
+#
+algorithm: quantile
+env: ac-pulse
+dataset_version: v12
+trainer_version: CQL
+
+train:
+    dataset_name: 500k_dataset
+    dataset_initial_day: "2020-10-27"
+    dataset_final_day: "2021-05-16"
+    init_checkpoint_dir: ""
+    gin_files: ["src/train_model/batch_rl/fixed_replay/configs/quantile.gin"]
+    gin_bindings:
+        [
+            "FixedReplayRunner.num_iterations=1000",
+            "FixedReplayQuantileAgent.minq_weight=4.0",
+            "FixedReplayRunner.training_steps=250000",
+        ]
+    load_experiment_checkpoint: False
+    train_id: Null
+    env_config:
+        obs_shape: 63
+
+    base_dataset_version: v11
+    evaluation_dataset_name: 10k_uniform_dataset_users
+
+evaluation:
+    only_during_train: True
+
+config: {}

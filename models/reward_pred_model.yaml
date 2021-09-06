@@ -1,0 +1,30 @@
+name: Action_Value_input_63
+
+input_size: 63
+learning_rate: [0.0005, 0.001, 0.0025]
+num_epochs: 7000
+batch_size: 20000
+epoch_size: 3
+
+optimizer: adam
+momentum: 0.9
+learning_rate_decay: 1.0
+
+checkpoint_freq: 500
+eval_freq: 500
+
+resume: False
+
+stop:
+    training_iteration: 7000 #will be ignored if resume is True
+
+dataset:
+    path: data/processed/v11_dataset/10k_top_500k
+
+custom_loss:
+    # a: [10, 20]
+    # c: [0.1, 0.5, 0.9]
+
+resources_per_trial:
+    cpu: 4
+    gpu: 0.325
