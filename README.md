@@ -2,7 +2,7 @@
 
 Code for PulseRL: Enabling Offline Reinforcement Learning for Digital Marketing Systems via Conservative Q-Learning.
 
-In this repository we provide code for PulseRL experiments described in the paper. 
+In this repository we provide code for PulseRL offline experiments described in the paper. Part of our code is built on top of the [CQL](https://github.com/aviralkumar2907/CQL) repository. 
 
 
 # Installation
@@ -34,3 +34,6 @@ To view the training and evaluation graphs, just run:
 
 	tensorboard --logdir models/
   
+  
+  
+In case of any questions, bugs, suggestions or improvements, please feel free to open an issue.
