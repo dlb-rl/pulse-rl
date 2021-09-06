@@ -1,5 +1,6 @@
 models/*
 !models/*.yaml
+!models/reward_pred_model/release/*
 
 data/processed/*
 
