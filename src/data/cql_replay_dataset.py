@@ -2,7 +2,7 @@ import os
 import gym
 import json
 import luigi
-import datetime
+
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
@@ -17,8 +17,7 @@ from src.train_model.batch_rl.baselines.replay_memory import WrappedLoggedReplay
 
 class CQLReplayDataset(luigi.Task):
     """
-    Given a Transitions DataFrame, iterate over transitions preprocessing
-    observations, having a Ray-compatible dataset as output.
+    Given a Ray-compatible dataset, iterate over transitions, having a CQL-compatible dataset as output.
     """
 
     ## Configuration file parameters
@@ -32,7 +31,7 @@ class CQLReplayDataset(luigi.Task):
     def __init__(self, *args, **kwargs):
         super(CQLReplayDataset, self).__init__(*args, **kwargs)
 
-        print("----- Initializing Generate Episodes")
+        print("----- Initializing Generate Dataset")
 
         self.timer = TaskTimer()
 

@@ -19,7 +19,7 @@ from ray.rllib.offline.wis_estimator import WeightedImportanceSamplingEstimator
 from ray.rllib.offline.is_estimator import ImportanceSamplingEstimator
 
 from src.task_timer import TaskTimer
-from . import utils
+from src.train_model import utils
 from src.train_model.custom_estimators import (
     CustomImportanceSamplingEstimator,
     get_registry_reward,
