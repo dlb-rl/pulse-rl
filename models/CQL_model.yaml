@@ -2,13 +2,13 @@
 #
 algorithm: quantile
 env: ac-pulse
-dataset_version: v12
+dataset_version: cql
 trainer_version: CQL
 
 train:
     dataset_name: 500k_dataset
     dataset_initial_day: "2020-10-27"
-    dataset_final_day: "2021-05-16"
+    dataset_final_day: "2021-04-30"
     init_checkpoint_dir: ""
     gin_files: ["src/train_model/batch_rl/fixed_replay/configs/quantile.gin"]
     gin_bindings:
@@ -22,7 +22,7 @@ train:
     env_config:
         obs_shape: 63
 
-    base_dataset_version: v11
+    base_dataset_version: ray
     evaluation_dataset_name: 10k_uniform_dataset_users
 
 evaluation:

@@ -1,7 +1,7 @@
 # behavior cloning model
 algorithm: BC
 env: ac-pulse
-dataset_version: v11
+dataset_version: ray
 trainer_version: RAY
 
 train:

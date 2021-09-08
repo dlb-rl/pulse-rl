@@ -19,7 +19,7 @@ stop:
     training_iteration: 7000 #will be ignored if resume is True
 
 dataset:
-    path: data/processed/v11_dataset/10k_top_500k
+    path: data/processed/ray_dataset/10k_top_500k
 
 custom_loss:
     # a: [10, 20]
